@@ -3,12 +3,12 @@ import { useReducer, useState } from "react";
 import {
   Button,
   FlatList,
+  Modal,
+  Pressable,
   StyleSheet,
   Text,
-  View,
-  Modal,
   TextInput,
-  Pressable,
+  View,
 } from "react-native";
 import ManageAction from "../component/manageAction";
 let nextID = 3;
