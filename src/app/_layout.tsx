@@ -1,27 +1,12 @@
-import FontAwesome from "@expo/vector-icons/FontAwesome";
-import { Tabs } from "expo-router";
-
-export default function TabLayout() {
+import { Stack } from "expo-router";
+import { Provider } from "react-redux";
+import { store } from "../component/app/store";
+export default function App() {
   return (
-    <Tabs screenOptions={{ tabBarActiveTintColor: "blue" }}>
-      <Tabs.Screen
-        name="order"
-        options={{
-          title: "Order",
-          tabBarIcon: ({ color }) => (
-            <FontAwesome size={28} name="truck" color={color} />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="product"
-        options={{
-          title: "Product",
-          tabBarIcon: ({ color }) => (
-            <FontAwesome size={28} name="shopping-cart" color={color} />
-          ),
-        }}
-      />
-    </Tabs>
+    <Provider store={store}>
+      <Stack>
+        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+      </Stack>
+    </Provider>
   );
 }

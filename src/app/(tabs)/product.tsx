@@ -1,5 +1,12 @@
+import { useAppDispatch, useAppSelector } from "@/src/component/app/hook";
+import {
+  type Product,
+  addProduct,
+  removeProduct,
+} from "@/src/component/features/product/productSlice";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
-import { useReducer, useState } from "react";
+import { nanoid } from "@reduxjs/toolkit";
+import { useState } from "react";
 import {
   Button,
   FlatList,
@@ -10,47 +17,13 @@ import {
   TextInput,
   View,
 } from "react-native";
-import ManageAction from "../component/manageAction";
-let nextID = 3;
-const productList = [
-  {
-    id: 0,
-    name: "Hamburger",
-    price: "$5.99",
-  },
-  {
-    id: 1,
-    name: "Chicken Nugget",
-    price: "$9.99",
-  },
-  {
-    id: 2,
-    name: "French Fries",
-    price: "$2.99",
-  },
-];
 export default function ManageProduct() {
-  const [product, dispatch] = useReducer(ManageAction, productList);
+  const productList = useAppSelector((state) => state.product);
+  const dispatch = useAppDispatch();
   const [visibility, setVisibility] = useState(false);
-  function addProduct(name: string, price: string) {
-    dispatch({
-      type: "add",
-      id: nextID++,
-      name: name,
-      price: price,
-    });
-  }
-
-  function removeProduct(id: number) {
-    dispatch({
-      type: "remove",
-      id: id,
-    });
-  }
-
   function AddProductButton() {
     const [newName, setNewName] = useState("");
-    const [newCost, setNewCost] = useState("");
+    const [newPrice, setNewPrice] = useState("");
     return (
       <Modal
         transparent={true}
@@ -69,15 +42,20 @@ export default function ManageProduct() {
             <Text>Assigned Price</Text>
             <TextInput
               style={styles.inputBox}
-              onChangeText={setNewCost}
-              value={newCost}
+              onChangeText={setNewPrice}
+              value={newPrice}
               maxLength={50}
             />
             <View style={styles.addButton}>
               <Button
                 title="Save"
                 onPress={() => {
-                  addProduct(newName, newCost);
+                  const temp: Product = {
+                    id: nanoid(),
+                    name: newName,
+                    price: newPrice,
+                  };
+                  dispatch(addProduct(temp));
                   setVisibility(!visibility);
                 }}
               />
@@ -91,13 +69,13 @@ export default function ManageProduct() {
   return (
     <>
       <FlatList
-        data={product}
+        data={productList}
         renderItem={({ item }) => (
           <View style={styles.item}>
             <Text style={styles.name}>{item.name}</Text>
             <Text style={styles.price}>{item.price}</Text>
             <View style={styles.deleteButton}>
-              <Pressable onPress={() => removeProduct(item.id)}>
+              <Pressable onPress={() => dispatch(removeProduct(item.id))}>
                 {" "}
                 <FontAwesome size={28} name="trash" color={"red"} />
               </Pressable>

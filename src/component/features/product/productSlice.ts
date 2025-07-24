@@ -1,24 +1,23 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-
+import { createSlice, nanoid, PayloadAction } from "@reduxjs/toolkit";
 export interface Product {
-  id: number;
+  id: string;
   name: string;
   price: string;
 }
 
 const initialState: Product[] = [
   {
-    id: 0,
+    id: nanoid(),
     name: "Hamburger",
     price: "$5.99",
   },
   {
-    id: 1,
+    id: nanoid(),
     name: "Chicken Nugget",
     price: "$9.99",
   },
   {
-    id: 2,
+    id: nanoid(),
     name: "French Fries",
     price: "$2.99",
   },
@@ -31,8 +30,11 @@ const productSlice = createSlice({
     addProduct(state, action: PayloadAction<Product>) {
       state.push(action.payload);
     },
-    removeProduct(state, action: PayloadAction<Product>) {
-      state.filter((t) => t.id !== action.payload.id);
+    removeProduct(state, action: PayloadAction<string>) {
+      state.splice(
+        state.findIndex((t) => t.id === action.payload),
+        1
+      );
     },
   },
 });
