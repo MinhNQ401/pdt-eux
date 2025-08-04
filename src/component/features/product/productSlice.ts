@@ -30,6 +30,11 @@ const productSlice = createSlice({
     addProduct(state, action: PayloadAction<Product>) {
       state.push(action.payload);
     },
+    editProduct(state, action: PayloadAction<Product>) {
+      let i = state.findIndex((t) => t.id === action.payload.id);
+      state[i].name = action.payload.name;
+      state[i].price = action.payload.price;
+    },
     removeProduct(state, action: PayloadAction<string>) {
       state.splice(
         state.findIndex((t) => t.id === action.payload),
@@ -39,5 +44,5 @@ const productSlice = createSlice({
   },
 });
 
-export const { addProduct, removeProduct } = productSlice.actions;
+export const { addProduct, editProduct, removeProduct } = productSlice.actions;
 export default productSlice.reducer;

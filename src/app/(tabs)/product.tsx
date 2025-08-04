@@ -2,6 +2,7 @@ import { useAppDispatch, useAppSelector } from "@/src/component/app/hook";
 import {
   type Product,
   addProduct,
+  editProduct,
   removeProduct,
 } from "@/src/component/features/product/productSlice";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
@@ -17,14 +18,14 @@ import {
   TextInput,
   View,
 } from "react-native";
-export default function ManageProduct() {
-  const productList = useAppSelector((state) => state.product);
-  const dispatch = useAppDispatch();
+
+function AddProductButton() {
+  const [newName, setNewName] = useState("");
+  const [newPrice, setNewPrice] = useState("");
   const [visibility, setVisibility] = useState(false);
-  function AddProductButton() {
-    const [newName, setNewName] = useState("");
-    const [newPrice, setNewPrice] = useState("");
-    return (
+  const dispatch = useAppDispatch();
+  return (
+    <>
       <Modal
         transparent={true}
         onRequestClose={() => setVisibility(!visibility)}
@@ -63,9 +64,66 @@ export default function ManageProduct() {
           </View>
         </View>
       </Modal>
-    );
-  }
+      <Button title="+" onPress={() => setVisibility(!visibility)} />
+    </>
+  );
+}
 
+function EditProductButton({ p }: { p: Product }) {
+  const [newName, setNewName] = useState(p.name);
+  const [newPrice, setNewPrice] = useState(p.price);
+  const [visibility, setVisibility] = useState(false);
+  const dispatch = useAppDispatch();
+  return (
+    <>
+      <Modal
+        transparent={true}
+        onRequestClose={() => setVisibility(!visibility)}
+        visible={visibility}
+      >
+        <View style={styles.popupBackground}>
+          <View style={styles.popupBox}>
+            <Text>Product Name</Text>
+            <TextInput
+              style={styles.inputBox}
+              onChangeText={setNewName}
+              value={newName}
+              maxLength={50}
+            />
+            <Text>Assigned Price</Text>
+            <TextInput
+              style={styles.inputBox}
+              onChangeText={setNewPrice}
+              value={newPrice}
+              maxLength={50}
+            />
+            <View style={styles.addButton}>
+              <Button
+                title="Save"
+                onPress={() => {
+                  const temp: Product = {
+                    id: p.id,
+                    name: newName,
+                    price: newPrice,
+                  };
+                  dispatch(editProduct(temp));
+                  setVisibility(!visibility);
+                }}
+              />
+            </View>
+          </View>
+        </View>
+      </Modal>
+      <Pressable onPress={() => setVisibility(!visibility)}>
+        <FontAwesome size={28} name="gear" color={"black"} />
+      </Pressable>
+    </>
+  );
+}
+
+export default function ManageProduct() {
+  const productList = useAppSelector((state) => state.product);
+  const dispatch = useAppDispatch();
   return (
     <>
       <FlatList
@@ -76,15 +134,14 @@ export default function ManageProduct() {
             <Text style={styles.price}>{item.price}</Text>
             <View style={styles.deleteButton}>
               <Pressable onPress={() => dispatch(removeProduct(item.id))}>
-                {" "}
                 <FontAwesome size={28} name="trash" color={"red"} />
               </Pressable>
+              <EditProductButton p={item} />
             </View>
           </View>
         )}
       />
       <AddProductButton />
-      <Button title="+" onPress={() => setVisibility(!visibility)} />
     </>
   );
 }
@@ -99,17 +156,19 @@ const styles = StyleSheet.create({
     marginHorizontal: 14,
   },
   name: {
-    fontSize: 32,
+    fontSize: 20,
   },
   price: {
-    fontSize: 24,
+    fontSize: 16,
     textAlign: "right",
   },
   addButton: {
     alignItems: "center",
   },
   deleteButton: {
+    flexDirection: "row-reverse",
     alignItems: "flex-end",
+    gap: "10",
   },
   popupBackground: {
     flex: 1,
